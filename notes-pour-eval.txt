@@ -1,0 +1,24 @@
+############## EVAL A RENDRE POUR LE 01/02/2019
+1- Améliorer les méthodes de sauvegarde et de restauration en mode mémoire (sans bdd)
+
+La méthode de sauvegarde est ok avec la version fournie, il vous restera à améliorer
+la méthode de restauration, qui ne fait aucune vérification d'existence de fichier de backup
+et ne propose pas d'alternative à l’utilisateur sur quelle base de sauvegarde repartir en terme
+de restauration. Proposer quelque chose d'ergonomique pour permettre la sélection d'un fichier de sauvegarde.
+
+
+
+2- Ajouter dans la fonctionnalité d'export celui en .csv
+
+Actuellement, je vous propose dans le code un affichage en console du carnet d'adresses au format XML.
+L'idée c'est de faire la même chose en CSV, voire exporter directement dans fichiers et non en console
+ (en changeant le outputStream) 
+
+
+
+3- Compléter la couche data (dal) en implémentant les accès BDD
+
+Dans cette partie, l'idée c'est d'abandonner le mode "mémoire" et permettre la 
+récupération/manipulation des données depuis une BDD relationnelle en s'appuyant sur
+la couche data (dal à compléter) depuis le App.java. Vous pourrez à partir de ce point
+partir sur un 2e projet pour pouvoir rendre les 3 points
