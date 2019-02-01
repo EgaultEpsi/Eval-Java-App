@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="C:/Users/egaul/eclipse-workspace/ORACLE NET/ojdbc8.jar"/>
+	<classpathentry kind="lib" path="C:/Users/egaul/eclipse/mysql-connector-java-8.0.14/mysql-connector-java-8.0.14.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

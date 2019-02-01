@@ -1,5 +1,7 @@
 package fr.epsi.book;
 
+import fr.epsi.book.dal.BookDAO;
+import fr.epsi.book.dal.ContactDAO;
 import fr.epsi.book.domain.Book;
 import fr.epsi.book.domain.Contact;
 
@@ -18,6 +20,10 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -31,7 +37,10 @@ public class App {
 	private static final Scanner sc = new Scanner(System.in);
 	private static Book book = new Book();
 
-	public static void main(String... args) {
+	private static ContactDAO daoContact = new ContactDAO();
+	private static BookDAO daoBook = new BookDAO();
+
+	public static void main(String... args) throws SQLException {
 		dspMainMenu();
 	}
 
@@ -73,10 +82,16 @@ public class App {
 		contact.setPhone(sc.nextLine());
 		contact.setType(getTypeFromKeyboard());
 		book.addContact(contact);
+		try{
+			daoContact.create(contact);
+			}
+		catch (SQLException e) {
+			System.err.println(e);
+			}
 		System.out.println("Nouveau contact ajout√© ...");
 	}
 
-	public static void editContact() {
+	public static void editContact() throws SQLException {
 		System.out.println("*********************************************");
 		System.out.println("**********Modification d'un contact**********");
 		dspContacts(false);
@@ -103,11 +118,12 @@ public class App {
 			if (!phone.isEmpty()) {
 				contact.setPhone(phone);
 			}
+			daoContact.update(contact);
 			System.out.println("Le contact a bien √©t√© modifi√© ...");
 		}
 	}
 
-	public static void deleteContact() {
+	public static void deleteContact() throws SQLException {
 		System.out.println("*********************************************");
 		System.out.println("***********Suppression d'un contact**********");
 		dspContacts(false);
@@ -117,6 +133,7 @@ public class App {
 		if (null == contact) {
 			System.out.println("Aucun contact trouv√© avec cet identifiant ...");
 		} else {
+			daoContact.remove(contact);
 			System.out.println("Le contact a bien √©t√© supprim√© ...");
 		}
 	}
@@ -180,9 +197,12 @@ public class App {
 	}
 
 	public static void dspContact(Contact contact) {
-		System.out.println(contact.getId() + "\t\t\t\t" + contact.getName() + "\t\t\t\t" + contact.getEmail()
-				+ "\t\t\t\t" + contact.getPhone() + "\t\t\t\t" + contact.getType());
+		
+		System.out.println(contact.getId() + "\t\t" + contact.getName() + "\t\t" + contact.getEmail()
+				+ "\t\t" + contact.getPhone() + "\t\t" + contact.getType());
 	}
+
+
 
 	public static void dspContacts(boolean dspHeader) {
 		if (dspHeader) {
@@ -195,7 +215,7 @@ public class App {
 		System.out.println("**************************************");
 	}
 
-	public static void dspMainMenu() {
+	public static void dspMainMenu() throws SQLException {
 		int response;
 		boolean first = true;
 		do {
@@ -212,10 +232,11 @@ public class App {
 			System.out.println("* 4 - Lister les contacts            *");
 			System.out.println("* 5 - Rechercher un contact          *");
 			System.out.println("* 6 - Trier les contacts             *");
-			System.out.println("* 7 - Sauvegarder                    *");
-			System.out.println("* 8 - Restaurer                      *");
-			System.out.println("* 9 - Export des contacts            *");
-			System.out.println("* 10 - Quitter                       *");
+			/*System.out.println("* 7 - Sauvegarder                  *");
+			System.out.println("* 8 - Restaurer                      *");*/
+			System.out.println("* 7 - Export des contacts            *");			
+			System.out.println("* 8 - CrÈer Book                     *");
+			System.out.println("* 10 - Quitter                        *");
 			System.out.println("**************************************");
 			System.out.print("*Votre choix : ");
 			try {
@@ -252,22 +273,30 @@ public class App {
 			sort();
 			dspMainMenu();
 			break;
-		case 7:
+		/*case 7:
 			storeContacts();
 			dspMainMenu();
 			break;
 		case 8:
 			restoreContacts();
 			dspMainMenu();
-			break;
-		case 9:
+			break;*/
+		case 7:
 			exportContacts();
 			dspMainMenu();
 			break;
+		case 8:
+			daoBook.create(book);
+			dspMainMenu();
+			break;
+		/*case 9:
+		 Modifier un book
+		 */
+			
 		}
 	}
 
-	private static void storeContacts() {
+	/*private static void storeContacts() {
 
 		Path path = Paths.get(BOOK_BKP_DIR);
 		if (!Files.isDirectory(path)) {
@@ -287,12 +316,10 @@ public class App {
 		}
 	}
 
-
 	private static void restoreContacts() {
 		int response;
-		
-		
-		//SÈlection du fichier ‡ restaurer depuis le dossier backup
+
+		// SÈlection du fichier ‡ restaurer depuis le dossier backup
 		System.out.println("**************************************");
 		System.out.println("*************Sauvegardes**************");
 		System.out.println("**************************************");
@@ -302,11 +329,11 @@ public class App {
 		File[] files = repertoire.listFiles();
 
 		for (int i = 0; i < files.length; i++) {
-			System.out.println("* " +i+ " - " + files[i].getName() + "        * ");
+			System.out.println("* " + i + " - " + files[i].getName() + "        * ");
 		}
 		System.out.println("**************************************");
-		
-		//Traitement du fichier sÈlectionnÈ
+
+		// Traitement du fichier sÈlectionnÈ
 		try {
 			response = sc.nextInt();
 		} catch (InputMismatchException e) {
@@ -314,8 +341,8 @@ public class App {
 		} finally {
 			sc.nextLine();
 		}
-		
-		//Restauration du fichier choisit
+
+		// Restauration du fichier choisit
 		try (DirectoryStream<Path> ds = Files.newDirectoryStream(Paths.get(BOOK_BKP_DIR), files[response].getName())) {
 
 			for (Path path : ds) {
@@ -335,8 +362,8 @@ public class App {
 			e.printStackTrace();
 		}
 	}
-
-	private static void exportContacts() {
+*/
+	private static void exportContacts() throws SQLException {
 		boolean first = true;
 		int response;
 		do {
@@ -428,5 +455,6 @@ public class App {
 			e.printStackTrace();
 		}
 	}
+	
 
 }

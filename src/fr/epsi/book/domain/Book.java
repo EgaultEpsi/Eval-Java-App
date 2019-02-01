@@ -13,11 +13,12 @@ import java.util.UUID;
 public class Book implements Serializable {
 	
 	private String id;
-	private String code;
+	private String statut;
 	private Map<String, Contact> contacts;
 	
 	public Book() {
 		id = UUID.randomUUID().toString();
+		statut = "Mes books";
 		contacts = new HashMap<>(  );
 	}
 	
@@ -27,14 +28,6 @@ public class Book implements Serializable {
 	
 	public void setId( String id ) {
 		this.id = id;
-	}
-	
-	public String getCode() {
-		return code;
-	}
-	
-	public void setCode( String code ) {
-		this.code = code;
 	}
 	
 	public Map<String, Contact> getContacts() {
@@ -56,4 +49,18 @@ public class Book implements Serializable {
 	public void removeContact( String id ) {
 		contacts.remove( id );
 	}
+
+	public Map<String, Contact> findAll() {
+		return contacts;
+	}
+
+	public String getStatut() {
+		return statut;
+	}
+	
+	public void setStatut( String statut ) {
+		this.statut = statut;
+	}
+
+	
 }

@@ -9,9 +9,9 @@ public interface IDAO<E, ID> {
 	
 	public E findById( ID id );
 	
-	public List<E> findAll();
+	public List<E> findAll() throws SQLException ;
 	
-	public E update( E o );
+	public E update( E o ) throws SQLException;
 	
-	public void remove( E o );
+	public void remove( E o ) throws SQLException;
 }
